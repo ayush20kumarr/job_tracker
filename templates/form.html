@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Add' }} Application{% endblock %}
+
+{% block content %}
+<h1>{{ 'Edit Application' if mode == 'edit' else 'Add Application' }}</h1>
+
+<form method="POST" class="app-form" action="{{ url_for('edit', app_id=app_id) if mode == 'edit' else url_for('add') }}">
+    <div class="form-row">
+        <label for="company">Company *</label>
+        <input type="text" id="company" name="company" value="{{ form_data.get('company', '') }}" required>
+    </div>
+
+    <div class="form-row">
+        <label for="position">Position *</label>
+        <input type="text" id="position" name="position" value="{{ form_data.get('position', '') }}" required>
+    </div>
+
+    <div class="form-row">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+            {% for s in status_choices %}
+            <option value="{{ s }}" {{ 'selected' if form_data.get('status') == s else '' }}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="date_applied">Date Applied</label>
+        <input type="date" id="date_applied" name="date_applied" value="{{ form_data.get('date_applied', '') }}">
+    </div>
+
+    <div class="form-row">
+        <label for="follow_up_date">Follow-up Date</label>
+        <input type="date" id="follow_up_date" name="follow_up_date" value="{{ form_data.get('follow_up_date', '') }}">
+    </div>
+
+    <div class="form-row">
+        <label for="job_url">Job URL</label>
+        <input type="url" id="job_url" name="job_url" placeholder="https://..." value="{{ form_data.get('job_url', '') }}">
+    </div>
+
+    <div class="form-row">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" rows="4">{{ form_data.get('notes', '') }}</textarea>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ 'Save Changes' if mode == 'edit' else 'Add Application' }}</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}

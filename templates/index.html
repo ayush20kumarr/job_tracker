@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Job Application Tracker{% endblock %}
+
+{% block content %}
+<section class="stats">
+    <div class="stat-card">
+        <span class="stat-number">{{ total }}</span>
+        <span class="stat-label">Total</span>
+    </div>
+    {% for status in status_choices %}
+    <div class="stat-card">
+        <span class="stat-number">{{ counts[status] }}</span>
+        <span class="stat-label">{{ status }}</span>
+    </div>
+    {% endfor %}
+</section>
+
+<section class="filter-bar">
+    <a href="{{ url_for('index') }}" class="filter-pill {{ 'active' if not current_filter else '' }}">All</a>
+    {% for status in status_choices %}
+    <a href="{{ url_for('index', status=status) }}" class="filter-pill {{ 'active' if current_filter == status else '' }}">{{ status }}</a>
+    {% endfor %}
+</section>
+
+{% if applications %}
+<div class="table-wrap">
+    <table class="app-table">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>Applied</th>
+                <th>Follow-up</th>
+                <th>Link</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in applications %}
+            <tr>
+                <td>{{ a.company }}</td>
+                <td>{{ a.position }}</td>
+                <td><span class="badge badge-{{ a.status|lower|replace(' ', '-') }}">{{ a.status }}</span></td>
+                <td>{{ a.date_applied.strftime('%b %d, %Y') if a.date_applied else '—' }}</td>
+                <td>
+                    {% if a.follow_up_date %}
+                        {{ a.follow_up_date.strftime('%b %d, %Y') }}
+                        {% if a.follow_up_date <= today %}<span class="due-tag">due</span>{% endif %}
+                    {% else %}—{% endif %}
+                </td>
+                <td>
+                    {% if a.job_url %}<a href="{{ a.job_url }}" target="_blank" rel="noopener">View</a>{% else %}—{% endif %}
+                </td>
+                <td class="actions">
+                    <a href="{{ url_for('edit', app_id=a.id) }}" class="btn btn-small">Edit</a>
+                    <form method="POST" action="{{ url_for('delete', app_id=a.id) }}" onsubmit="return confirm('Delete this application?');">
+                        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <p>No applications yet{{ ' for this status' if current_filter else '' }}.</p>
+    <a href="{{ url_for('add') }}" class="btn btn-primary">Add your first application</a>
+</div>
+{% endif %}
+{% endblock %}
